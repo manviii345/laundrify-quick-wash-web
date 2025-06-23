@@ -1,7 +1,6 @@
-
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { ArrowRight, Clock, Shield, Smartphone, Users, Star, CheckCircle } from 'lucide-react';
+import { ArrowRight, Clock, Shield, Smartphone, Users, Star, CheckCircle, UserCheck, Settings } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useAuth } from '@/contexts/AuthContext';
@@ -11,6 +10,7 @@ import Footer from '@/components/Footer';
 const Index = () => {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
+  const [showRoleSelection, setShowRoleSelection] = useState(false);
 
   useEffect(() => {
     if (!loading && user) {
@@ -32,6 +32,16 @@ const Index = () => {
   if (user) {
     return null; // Will redirect to dashboard
   }
+
+  const handleGetStarted = () => {
+    setShowRoleSelection(true);
+  };
+
+  const handleRoleSelection = (role: string) => {
+    // Store role preference in sessionStorage for the auth page
+    sessionStorage.setItem('selectedRole', role);
+    navigate('/auth');
+  };
 
   const features = [
     {
@@ -81,6 +91,57 @@ const Index = () => {
     <div className="min-h-screen bg-white font-inter">
       <Navbar />
       
+      {/* Role Selection Modal */}
+      {showRoleSelection && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl p-8 max-w-md w-full shadow-2xl">
+            <div className="text-center mb-6">
+              <h2 className="text-2xl font-bold text-gray-900 mb-2">Choose Your Role</h2>
+              <p className="text-gray-600">Select how you want to access the platform</p>
+            </div>
+            
+            <div className="space-y-4">
+              <button
+                onClick={() => handleRoleSelection('customer')}
+                className="w-full p-4 border-2 border-gray-200 rounded-xl hover:border-primary-500 hover:bg-primary-50 transition-all duration-200 group"
+              >
+                <div className="flex items-center space-x-4">
+                  <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center group-hover:bg-primary-100">
+                    <UserCheck className="h-6 w-6 text-blue-600 group-hover:text-primary-600" />
+                  </div>
+                  <div className="text-left">
+                    <h3 className="font-semibold text-gray-900">Student/User</h3>
+                    <p className="text-sm text-gray-600">Book laundry slots and track orders</p>
+                  </div>
+                </div>
+              </button>
+              
+              <button
+                onClick={() => handleRoleSelection('admin')}
+                className="w-full p-4 border-2 border-gray-200 rounded-xl hover:border-primary-500 hover:bg-primary-50 transition-all duration-200 group"
+              >
+                <div className="flex items-center space-x-4">
+                  <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center group-hover:bg-primary-100">
+                    <Settings className="h-6 w-6 text-purple-600 group-hover:text-primary-600" />
+                  </div>
+                  <div className="text-left">
+                    <h3 className="font-semibold text-gray-900">Admin/Staff</h3>
+                    <p className="text-sm text-gray-600">Manage orders and operations</p>
+                  </div>
+                </div>
+              </button>
+            </div>
+            
+            <button
+              onClick={() => setShowRoleSelection(false)}
+              className="w-full mt-6 py-2 text-gray-500 hover:text-gray-700 transition-colors"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Hero Section */}
       <section className="relative overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 pb-20">
@@ -94,12 +155,14 @@ const Index = () => {
               The future of hostel laundry is here.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center animate-fade-in">
-              <Link to="/auth">
-                <Button size="lg" className="bg-primary-500 hover:bg-primary-600 text-white rounded-full px-8 py-4 text-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300">
-                  Get Started Now
-                  <ArrowRight className="ml-2 h-5 w-5" />
-                </Button>
-              </Link>
+              <Button 
+                size="lg" 
+                onClick={handleGetStarted}
+                className="bg-primary-500 hover:bg-primary-600 text-white rounded-full px-8 py-4 text-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300"
+              >
+                Get Started Now
+                <ArrowRight className="ml-2 h-5 w-5" />
+              </Button>
               <Link to="/features">
                 <Button variant="outline" size="lg" className="border-primary-500 text-primary-600 hover:bg-primary-50 rounded-full px-8 py-4 text-lg font-semibold">
                   Learn More
@@ -236,12 +299,14 @@ const Index = () => {
           <p className="text-xl text-primary-100 mb-8">
             Join thousands of students who've already made the smart choice
           </p>
-          <Link to="/auth">
-            <Button size="lg" className="bg-white text-primary-600 hover:bg-gray-100 rounded-full px-8 py-4 text-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300">
-              Get Started Today
-              <ArrowRight className="ml-2 h-5 w-5" />
-            </Button>
-          </Link>
+          <Button 
+            size="lg" 
+            onClick={handleGetStarted}
+            className="bg-white text-primary-600 hover:bg-gray-100 rounded-full px-8 py-4 text-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300"
+          >
+            Get Started Today
+            <ArrowRight className="ml-2 h-5 w-5" />
+          </Button>
         </div>
       </section>
 
