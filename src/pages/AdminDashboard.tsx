@@ -12,6 +12,9 @@ import { useToast } from '@/hooks/use-toast';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import ProtectedRoute from '@/components/ProtectedRoute';
+import type { Database } from '@/integrations/supabase/types';
+
+type OrderStatus = Database['public']['Enums']['order_status'];
 
 const AdminDashboard = () => {
   const { user, signOut } = useAuth();
@@ -62,7 +65,7 @@ const AdminDashboard = () => {
     }
   };
 
-  const updateOrderStatus = async (orderId: string, newStatus: string) => {
+  const updateOrderStatus = async (orderId: string, newStatus: OrderStatus) => {
     try {
       const { error } = await supabase
         .from('laundry_orders')
@@ -272,7 +275,7 @@ const AdminDashboard = () => {
                     </div>
                     <div className="flex items-center space-x-4">
                       {getStatusBadge(order.status)}
-                      <Select value={order.status} onValueChange={(value) => updateOrderStatus(order.id, value)}>
+                      <Select value={order.status} onValueChange={(value) => updateOrderStatus(order.id, value as OrderStatus)}>
                         <SelectTrigger className="w-32">
                           <SelectValue />
                         </SelectTrigger>
