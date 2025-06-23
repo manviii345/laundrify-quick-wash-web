@@ -9,6 +9,48 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      batches: {
+        Row: {
+          batch_number: string
+          completed_at: string | null
+          created_at: string | null
+          created_by: string
+          drying_started_at: string | null
+          id: string
+          status: Database["public"]["Enums"]["batch_status"] | null
+          total_orders: number | null
+          updated_at: string | null
+          wash_type: Database["public"]["Enums"]["wash_type"]
+          washing_started_at: string | null
+        }
+        Insert: {
+          batch_number: string
+          completed_at?: string | null
+          created_at?: string | null
+          created_by: string
+          drying_started_at?: string | null
+          id?: string
+          status?: Database["public"]["Enums"]["batch_status"] | null
+          total_orders?: number | null
+          updated_at?: string | null
+          wash_type: Database["public"]["Enums"]["wash_type"]
+          washing_started_at?: string | null
+        }
+        Update: {
+          batch_number?: string
+          completed_at?: string | null
+          created_at?: string | null
+          created_by?: string
+          drying_started_at?: string | null
+          id?: string
+          status?: Database["public"]["Enums"]["batch_status"] | null
+          total_orders?: number | null
+          updated_at?: string | null
+          wash_type?: Database["public"]["Enums"]["wash_type"]
+          washing_started_at?: string | null
+        }
+        Relationships: []
+      }
       booking_items: {
         Row: {
           booking_id: string
@@ -89,6 +131,124 @@ export type Database = {
         }
         Relationships: []
       }
+      laundry_orders: {
+        Row: {
+          actual_cost: number | null
+          batch_id: string | null
+          completed_at: string | null
+          created_at: string | null
+          delivered_at: string | null
+          drying_started_at: string | null
+          estimated_cost: number | null
+          feedback: string | null
+          id: string
+          laundry_id: string
+          pickup_address: string | null
+          pickup_date: string | null
+          pickup_type: Database["public"]["Enums"]["pickup_type"]
+          qr_code: string | null
+          special_instructions: string | null
+          status: Database["public"]["Enums"]["order_status"] | null
+          sticky_note: string | null
+          updated_at: string | null
+          user_id: string
+          wash_type: Database["public"]["Enums"]["wash_type"]
+          washing_started_at: string | null
+        }
+        Insert: {
+          actual_cost?: number | null
+          batch_id?: string | null
+          completed_at?: string | null
+          created_at?: string | null
+          delivered_at?: string | null
+          drying_started_at?: string | null
+          estimated_cost?: number | null
+          feedback?: string | null
+          id?: string
+          laundry_id: string
+          pickup_address?: string | null
+          pickup_date?: string | null
+          pickup_type: Database["public"]["Enums"]["pickup_type"]
+          qr_code?: string | null
+          special_instructions?: string | null
+          status?: Database["public"]["Enums"]["order_status"] | null
+          sticky_note?: string | null
+          updated_at?: string | null
+          user_id: string
+          wash_type?: Database["public"]["Enums"]["wash_type"]
+          washing_started_at?: string | null
+        }
+        Update: {
+          actual_cost?: number | null
+          batch_id?: string | null
+          completed_at?: string | null
+          created_at?: string | null
+          delivered_at?: string | null
+          drying_started_at?: string | null
+          estimated_cost?: number | null
+          feedback?: string | null
+          id?: string
+          laundry_id?: string
+          pickup_address?: string | null
+          pickup_date?: string | null
+          pickup_type?: Database["public"]["Enums"]["pickup_type"]
+          qr_code?: string | null
+          special_instructions?: string | null
+          status?: Database["public"]["Enums"]["order_status"] | null
+          sticky_note?: string | null
+          updated_at?: string | null
+          user_id?: string
+          wash_type?: Database["public"]["Enums"]["wash_type"]
+          washing_started_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fk_batch"
+            columns: ["batch_id"]
+            isOneToOne: false
+            referencedRelation: "batches"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      order_status_history: {
+        Row: {
+          changed_by: string
+          created_at: string | null
+          id: string
+          new_status: Database["public"]["Enums"]["order_status"]
+          notes: string | null
+          order_id: string
+          previous_status: Database["public"]["Enums"]["order_status"] | null
+        }
+        Insert: {
+          changed_by: string
+          created_at?: string | null
+          id?: string
+          new_status: Database["public"]["Enums"]["order_status"]
+          notes?: string | null
+          order_id: string
+          previous_status?: Database["public"]["Enums"]["order_status"] | null
+        }
+        Update: {
+          changed_by?: string
+          created_at?: string | null
+          id?: string
+          new_status?: Database["public"]["Enums"]["order_status"]
+          notes?: string | null
+          order_id?: string
+          previous_status?: Database["public"]["Enums"]["order_status"] | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "order_status_history_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "laundry_orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           created_at: string | null
@@ -96,6 +256,8 @@ export type Database = {
           hostel_name: string | null
           id: string
           phone: string | null
+          phone_verified: boolean | null
+          role: Database["public"]["Enums"]["user_role"] | null
           room_number: string | null
           updated_at: string | null
         }
@@ -105,6 +267,8 @@ export type Database = {
           hostel_name?: string | null
           id: string
           phone?: string | null
+          phone_verified?: boolean | null
+          role?: Database["public"]["Enums"]["user_role"] | null
           room_number?: string | null
           updated_at?: string | null
         }
@@ -114,6 +278,8 @@ export type Database = {
           hostel_name?: string | null
           id?: string
           phone?: string | null
+          phone_verified?: boolean | null
+          role?: Database["public"]["Enums"]["user_role"] | null
           room_number?: string | null
           updated_at?: string | null
         }
@@ -152,8 +318,17 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: string
       }
+      generate_batch_number: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
+      generate_laundry_id: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
     }
     Enums: {
+      batch_status: "created" | "washing" | "drying" | "completed"
       booking_status:
         | "pending"
         | "confirmed"
@@ -178,6 +353,16 @@ export type Database = {
         | "regular_wash"
         | "delicate_care"
         | "dry_cleaning"
+      order_status:
+        | "pending"
+        | "picked_up"
+        | "washing"
+        | "drying"
+        | "completed"
+        | "delivered"
+      pickup_type: "self_drop" | "pickup"
+      user_role: "admin" | "staff" | "customer"
+      wash_type: "normal" | "stain_warm"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -293,6 +478,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      batch_status: ["created", "washing", "drying", "completed"],
       booking_status: [
         "pending",
         "confirmed",
@@ -320,6 +506,17 @@ export const Constants = {
         "delicate_care",
         "dry_cleaning",
       ],
+      order_status: [
+        "pending",
+        "picked_up",
+        "washing",
+        "drying",
+        "completed",
+        "delivered",
+      ],
+      pickup_type: ["self_drop", "pickup"],
+      user_role: ["admin", "staff", "customer"],
+      wash_type: ["normal", "stain_warm"],
     },
   },
 } as const
