@@ -9,16 +9,175 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      booking_items: {
+        Row: {
+          booking_id: string
+          clothing_type: Database["public"]["Enums"]["clothing_type"]
+          id: string
+          quantity: number
+        }
+        Insert: {
+          booking_id: string
+          clothing_type: Database["public"]["Enums"]["clothing_type"]
+          id?: string
+          quantity?: number
+        }
+        Update: {
+          booking_id?: string
+          clothing_type?: Database["public"]["Enums"]["clothing_type"]
+          id?: string
+          quantity?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "booking_items_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "bookings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      bookings: {
+        Row: {
+          barcode_id: string | null
+          booking_date: string
+          created_at: string | null
+          estimated_cost: number | null
+          id: string
+          laundry_type: Database["public"]["Enums"]["laundry_type"]
+          pickup_date: string | null
+          pickup_time: string | null
+          special_instructions: string | null
+          status: Database["public"]["Enums"]["booking_status"] | null
+          time_slot: string
+          total_items: number | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          barcode_id?: string | null
+          booking_date: string
+          created_at?: string | null
+          estimated_cost?: number | null
+          id?: string
+          laundry_type: Database["public"]["Enums"]["laundry_type"]
+          pickup_date?: string | null
+          pickup_time?: string | null
+          special_instructions?: string | null
+          status?: Database["public"]["Enums"]["booking_status"] | null
+          time_slot: string
+          total_items?: number | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          barcode_id?: string | null
+          booking_date?: string
+          created_at?: string | null
+          estimated_cost?: number | null
+          id?: string
+          laundry_type?: Database["public"]["Enums"]["laundry_type"]
+          pickup_date?: string | null
+          pickup_time?: string | null
+          special_instructions?: string | null
+          status?: Database["public"]["Enums"]["booking_status"] | null
+          time_slot?: string
+          total_items?: number | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          created_at: string | null
+          full_name: string | null
+          hostel_name: string | null
+          id: string
+          phone: string | null
+          room_number: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          full_name?: string | null
+          hostel_name?: string | null
+          id: string
+          phone?: string | null
+          room_number?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          full_name?: string | null
+          hostel_name?: string | null
+          id?: string
+          phone?: string | null
+          room_number?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      user_activity: {
+        Row: {
+          activity_type: string
+          created_at: string | null
+          description: string | null
+          id: string
+          user_id: string
+        }
+        Insert: {
+          activity_type: string
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          user_id: string
+        }
+        Update: {
+          activity_type?: string
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      generate_barcode: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
     }
     Enums: {
-      [_ in never]: never
+      booking_status:
+        | "pending"
+        | "confirmed"
+        | "in_progress"
+        | "completed"
+        | "cancelled"
+      clothing_type:
+        | "shirts"
+        | "trousers"
+        | "jeans"
+        | "t_shirts"
+        | "dresses"
+        | "skirts"
+        | "jackets"
+        | "underwear"
+        | "socks"
+        | "bedsheets"
+        | "towels"
+        | "others"
+      laundry_type:
+        | "quick_wash"
+        | "regular_wash"
+        | "delicate_care"
+        | "dry_cleaning"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -133,6 +292,34 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      booking_status: [
+        "pending",
+        "confirmed",
+        "in_progress",
+        "completed",
+        "cancelled",
+      ],
+      clothing_type: [
+        "shirts",
+        "trousers",
+        "jeans",
+        "t_shirts",
+        "dresses",
+        "skirts",
+        "jackets",
+        "underwear",
+        "socks",
+        "bedsheets",
+        "towels",
+        "others",
+      ],
+      laundry_type: [
+        "quick_wash",
+        "regular_wash",
+        "delicate_care",
+        "dry_cleaning",
+      ],
+    },
   },
 } as const

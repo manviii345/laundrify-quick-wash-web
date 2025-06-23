@@ -1,12 +1,38 @@
 
-import { Link } from 'react-router-dom';
+import { useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { ArrowRight, Clock, Shield, Smartphone, Users, Star, CheckCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { useAuth } from '@/contexts/AuthContext';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 
 const Index = () => {
+  const { user, loading } = useAuth();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!loading && user) {
+      navigate('/dashboard');
+    }
+  }, [user, loading, navigate]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-white font-inter flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-primary-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (user) {
+    return null; // Will redirect to dashboard
+  }
+
   const features = [
     {
       icon: Clock,
@@ -68,9 +94,9 @@ const Index = () => {
               The future of hostel laundry is here.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center animate-fade-in">
-              <Link to="/book-slot">
+              <Link to="/auth">
                 <Button size="lg" className="bg-primary-500 hover:bg-primary-600 text-white rounded-full px-8 py-4 text-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300">
-                  Book Your Slot Now
+                  Get Started Now
                   <ArrowRight className="ml-2 h-5 w-5" />
                 </Button>
               </Link>
@@ -210,7 +236,7 @@ const Index = () => {
           <p className="text-xl text-primary-100 mb-8">
             Join thousands of students who've already made the smart choice
           </p>
-          <Link to="/book-slot">
+          <Link to="/auth">
             <Button size="lg" className="bg-white text-primary-600 hover:bg-gray-100 rounded-full px-8 py-4 text-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300">
               Get Started Today
               <ArrowRight className="ml-2 h-5 w-5" />
