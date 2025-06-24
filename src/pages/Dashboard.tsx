@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Calendar, Clock, Package, CheckCircle, Plus, BarChart3, Star, Shirt, ArrowRight, LogOut } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -18,46 +17,90 @@ const Dashboard = () => {
   const [profile, setProfile] = useState<any>(null);
   const [bookings, setBookings] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    console.log('Dashboard mounted, user:', user);
     if (user) {
       fetchUserData();
+    } else {
+      console.log('No user found in Dashboard');
+      setLoading(false);
     }
   }, [user]);
 
   const fetchUserData = async () => {
+    if (!user?.id) {
+      console.log('No user ID available');
+      setLoading(false);
+      return;
+    }
+
     try {
+      console.log('Fetching user data for:', user.id);
+      
       // Fetch user profile
-      const { data: profileData } = await supabase
+      const { data: profileData, error: profileError } = await supabase
         .from('profiles')
         .select('*')
-        .eq('id', user?.id)
+        .eq('id', user.id)
         .single();
 
-      setProfile(profileData);
+      if (profileError) {
+        console.error('Profile fetch error:', profileError);
+        // Don't fail completely if profile doesn't exist, just log it
+        if (profileError.code !== 'PGRST116') { // Not found error
+          throw profileError;
+        }
+      } else {
+        console.log('Profile data:', profileData);
+        setProfile(profileData);
+      }
 
       // Fetch user bookings
-      const { data: bookingsData } = await supabase
+      const { data: bookingsData, error: bookingsError } = await supabase
         .from('bookings')
         .select('*')
-        .eq('user_id', user?.id)
+        .eq('user_id', user.id)
         .order('created_at', { ascending: false })
         .limit(5);
 
+      if (bookingsError) {
+        console.error('Bookings fetch error:', bookingsError);
+        throw bookingsError;
+      }
+
+      console.log('Bookings data:', bookingsData);
       setBookings(bookingsData || []);
+      setError(null);
     } catch (error) {
       console.error('Error fetching user data:', error);
+      setError('Failed to load dashboard data');
+      toast({
+        title: "Error",
+        description: "Failed to load dashboard data. Please try refreshing.",
+        variant: "destructive"
+      });
     } finally {
       setLoading(false);
     }
   };
 
   const handleSignOut = async () => {
-    await signOut();
-    toast({
-      title: "Signed Out",
-      description: "You have been signed out successfully",
-    });
+    try {
+      await signOut();
+      toast({
+        title: "Signed Out",
+        description: "You have been signed out successfully",
+      });
+    } catch (error) {
+      console.error('Sign out error:', error);
+      toast({
+        title: "Error",
+        description: "Failed to sign out",
+        variant: "destructive"
+      });
+    }
   };
 
   if (loading) {
@@ -66,6 +109,23 @@ const Dashboard = () => {
         <div className="text-center">
           <div className="w-16 h-16 border-4 border-primary-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
           <p className="text-gray-600">Loading your dashboard...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-50 font-inter flex items-center justify-center">
+        <div className="text-center">
+          <div className="text-red-500 mb-4">
+            <Package className="h-16 w-16 mx-auto mb-4" />
+          </div>
+          <h2 className="text-xl font-semibold text-gray-900 mb-2">Something went wrong</h2>
+          <p className="text-gray-600 mb-4">{error}</p>
+          <Button onClick={() => window.location.reload()} className="bg-primary-500 hover:bg-primary-600">
+            Retry
+          </Button>
         </div>
       </div>
     );
@@ -107,7 +167,7 @@ const Dashboard = () => {
             <div className="flex flex-col md:flex-row md:items-center md:justify-between">
               <div>
                 <h1 className="text-3xl font-bold text-gray-900 mb-2">
-                  Welcome back, {profile?.full_name || user?.email?.split('@')[0]}! 👋
+                  Welcome back, {profile?.full_name || user?.email?.split('@')[0] || 'User'}! 👋
                 </h1>
                 <p className="text-gray-600">
                   {profile?.hostel_name && profile?.room_number ? 
