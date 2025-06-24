@@ -12,7 +12,9 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
   const navigate = useNavigate();
 
   useEffect(() => {
+    console.log('ProtectedRoute: user:', user, 'loading:', loading);
     if (!loading && !user) {
+      console.log('ProtectedRoute: Redirecting to /auth');
       navigate('/auth');
     }
   }, [user, loading, navigate]);
