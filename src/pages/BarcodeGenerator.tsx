@@ -1,5 +1,5 @@
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { Download, Share2, CheckCircle, Clock, Package } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -18,31 +18,47 @@ const BarcodeGenerator = () => {
   const { toast } = useToast();
   const [booking, setBooking] = useState<any>(null);
   const [barcodeGenerated, setBarcodeGenerated] = useState(false);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
     // Load JsBarcode from CDN
     const script = document.createElement('script');
     script.src = 'https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js';
     script.onload = () => {
+      console.log('JsBarcode loaded successfully');
       // Get booking data from localStorage
       const storedBooking = localStorage.getItem('currentBooking');
       if (storedBooking) {
         const bookingData = JSON.parse(storedBooking);
         setBooking(bookingData);
-        generateBarcode(bookingData.orderId);
+        // Small delay to ensure canvas is rendered
+        setTimeout(() => {
+          generateBarcode(bookingData.orderId);
+        }, 100);
       }
+    };
+    script.onerror = () => {
+      console.error('Failed to load JsBarcode');
+      toast({
+        title: "Error",
+        description: "Failed to load barcode library",
+        variant: "destructive"
+      });
     };
     document.head.appendChild(script);
 
     return () => {
-      document.head.removeChild(script);
+      if (document.head.contains(script)) {
+        document.head.removeChild(script);
+      }
     };
   }, []);
 
   const generateBarcode = (orderId: string) => {
-    if (window.JsBarcode) {
+    if (window.JsBarcode && canvasRef.current) {
       try {
-        window.JsBarcode("#barcode", orderId, {
+        console.log('Generating barcode for:', orderId);
+        window.JsBarcode(canvasRef.current, orderId, {
           format: "CODE128",
           width: 2,
           height: 100,
@@ -51,6 +67,7 @@ const BarcodeGenerator = () => {
           textMargin: 10
         });
         setBarcodeGenerated(true);
+        console.log('Barcode generated successfully');
       } catch (error) {
         console.error('Error generating barcode:', error);
         toast({
@@ -59,15 +76,16 @@ const BarcodeGenerator = () => {
           variant: "destructive"
         });
       }
+    } else {
+      console.error('JsBarcode not loaded or canvas not available');
     }
   };
 
   const downloadBarcode = () => {
-    const canvas = document.getElementById('barcode') as HTMLCanvasElement;
-    if (canvas) {
+    if (canvasRef.current) {
       const link = document.createElement('a');
       link.download = `laundrify-${booking.orderId}.png`;
-      link.href = canvas.toDataURL();
+      link.href = canvasRef.current.toDataURL();
       link.click();
       
       toast({
@@ -181,7 +199,7 @@ const BarcodeGenerator = () => {
             <CardContent>
               <div className="bg-white p-6 rounded-xl border-2 border-dashed border-gray-200 text-center mb-6">
                 {barcodeGenerated ? (
-                  <canvas id="barcode" className="mx-auto"></canvas>
+                  <canvas ref={canvasRef} className="mx-auto"></canvas>
                 ) : (
                   <div className="py-8">
                     <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-500 mx-auto mb-4"></div>
