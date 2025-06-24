@@ -10,8 +10,8 @@ interface AuthContextType {
   loading: boolean;
   userRole: string | null;
   signOut: () => Promise<void>;
-  signInWithOTP: (phone: string) => Promise<{ error: any }>;
-  verifyOTP: (phone: string, token: string) => Promise<{ error: any }>;
+  signInWithEmail: (email: string, password: string) => Promise<{ error: any }>;
+  signUpWithEmail: (email: string, password: string) => Promise<{ error: any }>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -78,21 +78,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return () => subscription.unsubscribe();
   }, [navigate]);
 
-  const signInWithOTP = async (phone: string) => {
-    const { error } = await supabase.auth.signInWithOtp({
-      phone,
-      options: {
-        channel: 'sms'
-      }
+  const signInWithEmail = async (email: string, password: string) => {
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
     });
     return { error };
   };
 
-  const verifyOTP = async (phone: string, token: string) => {
-    const { error } = await supabase.auth.verifyOtp({
-      phone,
-      token,
-      type: 'sms'
+  const signUpWithEmail = async (email: string, password: string) => {
+    const { error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        emailRedirectTo: `${window.location.origin}/`
+      }
     });
     return { error };
   };
@@ -108,8 +108,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     loading,
     userRole,
     signOut,
-    signInWithOTP,
-    verifyOTP,
+    signInWithEmail,
+    signUpWithEmail,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

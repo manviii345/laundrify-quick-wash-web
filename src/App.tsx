@@ -11,7 +11,7 @@ import BookSlot from "./pages/BookSlot";
 import Schedule from "./pages/Schedule";
 import BarcodeGenerator from "./pages/BarcodeGenerator";
 import Login from "./pages/Login";
-import PhoneAuth from "./pages/PhoneAuth";
+import Auth from "./pages/Auth";
 import Contact from "./pages/Contact";
 import Dashboard from "./pages/Dashboard";
 import AdminDashboard from "./pages/AdminDashboard";
@@ -34,7 +34,7 @@ const App = () => (
             <Route path="/schedule" element={<Schedule />} />
             <Route path="/barcode" element={<BarcodeGenerator />} />
             <Route path="/login" element={<Login />} />
-            <Route path="/auth" element={<PhoneAuth />} />
+            <Route path="/auth" element={<Auth />} />
             <Route path="/contact" element={<Contact />} />
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/admin-dashboard" element={<AdminDashboard />} />
